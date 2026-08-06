@@ -1,5 +1,5 @@
 {
-  "name": "challonge-api-starter",
+  "name": "enzeic_challonge_visualiser",
   "version": "2.0.0",
   "description": "Minimal starter for the Challonge API v2.1, including a live match scoreboard server",
   "main": "server.js",

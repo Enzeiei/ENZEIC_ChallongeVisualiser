@@ -15,7 +15,8 @@
  *      CHALLONGE_TOURNAMENT_ID
  *   3. node server.js
  *   4. Open http://localhost:3000
- */
+ *      (or whatever localhost you change it to thereafter) 
+*/
 
 require('dotenv').config();
 const path = require('path');
@@ -25,16 +26,16 @@ const { listMatches, listParticipants, listStations } = require('./lib/challonge
 const PORT = process.env.PORT || 3000;
 const TOURNAMENT_ID = process.env.CHALLONGE_TOURNAMENT_ID;
 const DEFAULT_INTERVAL_MS = Number(process.env.POLL_INTERVAL_MS) || 20000;
-const MIN_INTERVAL_MS = 5000; // guardrail so the toggle UI can't hammer the API / your rate limit
+const MIN_INTERVAL_MS = 5000; // guardrail so the toggle UI can't spam the API/rate limit
 
 if (!TOURNAMENT_ID) {
   console.error('Missing CHALLONGE_TOURNAMENT_ID in .env — set it to the tournament you want to display.');
   process.exit(1);
 }
 
-// ---------------------------------------------------------------
+// ---
 // In-memory state: this is what the frontend reads from
-// ---------------------------------------------------------------
+// ---
 const state = {
   autoPollEnabled: true,
   intervalMs: DEFAULT_INTERVAL_MS,
@@ -46,9 +47,9 @@ const state = {
 
 let timer = null;
 
-// ---------------------------------------------------------------
+// ---
 // Poll + merge logic
-// ---------------------------------------------------------------
+// ---
 async function pollChallonge() {
   state.isPolling = true;
   try {
@@ -106,9 +107,9 @@ async function pollChallonge() {
   return state;
 }
 
-// ---------------------------------------------------------------
+// ---
 // Auto-poll timer control
-// ---------------------------------------------------------------
+// ---
 function startAutoPoll() {
   stopAutoPoll();
   state.autoPollEnabled = true;
@@ -122,9 +123,9 @@ function stopAutoPoll() {
   state.autoPollEnabled = false;
 }
 
-// ---------------------------------------------------------------
+// ---
 // HTTP API
-// ---------------------------------------------------------------
+// ---
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -141,7 +142,7 @@ app.get('/api/matches', (req, res) => {
   });
 });
 
-// Trigger one manual poll immediately, regardless of auto-poll setting
+// instant manual poll, regardless of auto-poll setting
 app.post('/api/poll', async (req, res) => {
   await pollChallonge();
   res.json({
