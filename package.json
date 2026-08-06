@@ -13,5 +13,10 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "node-fetch": "^2.7.0"
-  }
+  },
+  "repository": {
+  "type": "git",
+  "url": "https://github.com/Enzeiei/ENZEIC_ChallongeVisualiser"
+  },
+  "license": "GNU GPLv3"
 }
