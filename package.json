@@ -15,8 +15,8 @@
     "node-fetch": "^2.7.0"
   },
   "repository": {
-  "type": "git",
-  "url": "https://github.com/Enzeiei/ENZEIC_ChallongeVisualiser"
+    "type": "git",
+    "url": "https://github.com/Enzeiei/ENZEIC_ChallongeVisualiser"
   },
-  "license": "GNU GPLv3"
+  "license": "GPL-3.0-or-later"
 }
