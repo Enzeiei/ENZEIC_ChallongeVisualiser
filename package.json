@@ -1,0 +1,17 @@
+{
+  "name": "challonge-api-starter",
+  "version": "2.0.0",
+  "description": "Minimal starter for the Challonge API v2.1, including a live match scoreboard server",
+  "main": "server.js",
+  "scripts": {
+    "list": "node challonge.js list",
+    "create": "node challonge.js create",
+    "start": "node server.js",
+    "scoreboard": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0"
+  }
+}
