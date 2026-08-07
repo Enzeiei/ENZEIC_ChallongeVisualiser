@@ -157,6 +157,20 @@ app.get('/api/matches', (req, res) => {
   });
 });
 
+// Evil testing...
+// Mark an open match as underway on Challonge, then refresh our cache so
+// the UI reflects it immediately without waiting for the next auto-poll.
+app.post('/api/matches/:matchId/mark-underway', async (req, res) => {
+  const { matchId } = req.params;
+  try {
+    await markMatchUnderway(TOURNAMENT_ID, matchId);
+    await pollChallonge();
+    res.json({ ok: true, matches: state.matches, lastPolledAt: state.lastPolledAt, lastError: state.lastError });
+  } catch (err) {
+    res.status(err.status || 500).json({ ok: false, error: err.message });
+  }
+});
+
 // instant manual poll, regardless of auto-poll setting
 app.post('/api/poll', async (req, res) => {
   await pollChallonge();
