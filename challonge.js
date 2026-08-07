@@ -11,10 +11,11 @@
  * Setup:
  *   1. npm install
  *   2. Get a v1 key at https://challonge.com/settings/developer
- *   3. Copy .env.example to .env and fill in CHALLONGE_API_KEY
+ *   3. Copy .env.example to a new file named .env and fill in CHALLONGE_API_KEY
  */
 
 require('dotenv').config();
+
 const {
   listTournaments,
   createTournament,
