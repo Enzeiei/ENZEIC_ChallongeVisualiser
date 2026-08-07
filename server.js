@@ -21,7 +21,7 @@
 require('dotenv').config();
 const path = require('path');
 const express = require('express');
-const { listMatches, listParticipants, listStations } = require('./lib/challonge-client');
+const { listMatches, listAllParticipants, listStations } = require('./lib/challonge-client');
 
 const PORT = process.env.PORT || 3000;
 const TOURNAMENT_ID = process.env.CHALLONGE_TOURNAMENT_ID;
@@ -53,28 +53,43 @@ let timer = null;
 async function pollChallonge() {
   state.isPolling = true;
   try {
-    const [matchesRes, participantsRes, stationsRes] = await Promise.all([
-      // Only pull matches actively worth showing on a screen.
-      listMatches(TOURNAMENT_ID, 'underway'),
-      listParticipants(TOURNAMENT_ID),
-      listStations(TOURNAMENT_ID).catch(() => ({ data: [] })), // stations may not be enabled on every plan
+    const [openRes, pendingRes, participantsRes, stationsRes] = await Promise.all([
+      listMatches(TOURNAMENT_ID, 'open'),
+      listMatches(TOURNAMENT_ID, 'pending'),
+      // listMatches(TOURNAMENT_ID, 'complete'),
+      listAllParticipants(TOURNAMENT_ID),
+      listStations(TOURNAMENT_ID).catch(() => ({ data: [] })),
     ]);
+
+    const matchesData = [...(openRes.data || []), ...(pendingRes.data || [])];
 
     const participantsById = {};
     for (const p of participantsRes.data || []) {
       participantsById[p.id] = p.attributes?.name || `Participant ${p.id}`;
-    }
+    } // name yoink?
 
     const stationsById = {};
     for (const s of stationsRes.data || []) {
       stationsById[s.id] = s.attributes?.identifier || s.attributes?.number || `Station ${s.id}`;
     }
 
-    const merged = (matchesRes.data || []).map(m => {
+    const merged = matchesData.map(m => {
       const a = m.attributes || {};
-      const player1Id = a.relationships?.player1?.data?.id;
-      const player2Id = a.relationships?.player2?.data?.id;
-      const stationId = a.relationships?.station?.data?.id;
+      const player1Id = m.relationships?.player1?.data?.id;   // fixed: read from the match resource itself
+      const player2Id = m.relationships?.player2?.data?.id;
+      const stationId = m.relationships?.station?.data?.id;
+      
+      // If we have an ID but it's still not in the participants map after
+      // pagination, dump the raw match + known IDs so the mismatch is visible.
+      const unresolved =
+        (player1Id && !(player1Id in participantsById)) ||
+        (player2Id && !(player2Id in participantsById));
+      if (unresolved && !loggedUnresolvedSample) {
+        loggedUnresolvedSample = true;
+        console.warn('--- Unresolved participant ID(s) — raw match for inspection ---');
+        console.warn(JSON.stringify(m, null, 2));
+        console.warn('Known participant IDs (sample):', Object.keys(participantsById).slice(0, 10));
+      }
 
       return {
         id: m.id,

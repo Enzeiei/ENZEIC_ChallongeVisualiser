@@ -316,7 +316,7 @@
   <div class="topbar">
     <div class="brand">
       <span class="dot" id="statusDot"></span>
-      <h1>Live Bracket</h1>
+      <h1>ENZEIC Live Bracket</h1>
       <span class="status-text" id="statusText">connecting…</span>
     </div>
 
@@ -337,8 +337,19 @@
           <option value="60000">60s</option>
         </select>
       </div>
-
       <button class="poll-now" id="pollNowBtn">Poll now</button>
+      
+      <div class="control-group filter-group">
+        <span class="control-label">Show</span>
+        <label class="check-pill">
+          <input type="checkbox" id="filterPending" checked>
+          <span>Live</span>
+        </label>
+        <label class="check-pill">
+          <input type="checkbox" id="filterOpen" checked>
+          <span>Upcoming</span>
+        </label>
+      </div>
     </div>
   </div>
 
@@ -371,6 +382,19 @@
   const emptyState = document.getElementById('emptyState');
 
   let displayTimer = null;
+
+  let latestData = { matches: [] };
+
+  function getFilteredMatches() {
+    const showPending = filterPending.checked;
+    const showOpen = filterOpen.checked;
+    return (latestData.matches || []).filter(m => {
+      if (m.state === 'pending') return showPending;
+      if (m.state === 'open') return showOpen;
+      return true;
+    });
+  }
+
   const DISPLAY_REFRESH_MS = 3000; // how often the page re-reads our own cache (cheap, local only)
 
   function fmtTime(iso) {
@@ -382,7 +406,7 @@
   function render(data) {
     const matches = data.matches || [];
 
-    matchCount.textContent = `${matches.length} match${matches.length === 1 ? '' : 'es'} underway`;
+    matchCount.textContent = `${matches.length} match${matches.length === 1 ? '' : 'es'} pending`;
     lastPolled.textContent = `last polled ${fmtTime(data.lastPolledAt)}`;
 
     if (data.lastError) {
