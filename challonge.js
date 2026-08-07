@@ -44,7 +44,7 @@ async function cmdParticipants(tournamentId) {
   participants.forEach(p => console.log(`  - ${p.attributes?.name} (id: ${p.id})`));
 }
 
-async function cmdMatches(tournamentId, state) {  
+async function cmdMatches(tournamentId, state) { // outta cmdline
   const result = await listMatches(tournamentId, state);
   const matches = result.data || [];
   console.log(`Found ${matches.length} match(es)${state ? ` with state="${state}"` : ''}:`);
@@ -54,7 +54,7 @@ async function cmdMatches(tournamentId, state) {
   });
 }
 
-async function main() {
+async function main() { // when used as function... duh
   const [, , command, ...args] = process.argv;
 
   try {
